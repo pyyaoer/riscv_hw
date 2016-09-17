@@ -13,7 +13,7 @@
 using std::string;
 using std::vector;
 
-#define LOG_FOR_TEST
+// #define LOG_FOR_TEST
 #define DISALLOW_COPY_AND_ASSIGN(TypeName) \
   TypeName(const TypeName&); \
   void operator=(const TypeName&)
@@ -49,8 +49,14 @@ class ReadELF {
   // return value:
   //   True for success
   bool AnalyzeSectionHeader(int fd);
-  // Show elements in the header for DEBUG.
+  // Show elements in the ELF header.
+  bool AnalyzeSectionName(int fd);
+  // Show elements in the ELF header.
   void PrintELFHeader();
+  // Show elements in the program headers.
+  void PrintProgramHeader();
+  // Show elements in the section headers.
+  void PrintSectionHeader();
 
   string file_name() const { return file_name_; }
   void set_file_name(const string &name) {
@@ -68,6 +74,9 @@ class ReadELF {
   bool AnalyzeSectionHeader64(int fd);
   void PrintSectionHeader32(Elf32_Shdr *hdr);
   void PrintSectionHeader64(Elf64_Shdr *hdr);
+  // 32-bit & 64-bit for AnalyzeSectionName(int)
+  bool AnalyzeSectionName32(int fd);
+  bool AnalyzeSectionName64(int fd);
   // 32-bit & 64-bit for PrintELFHeader()
   void PrintELF32Header();
   void PrintELF64Header();
@@ -80,6 +89,8 @@ class ReadELF {
   vector<Elf64_Phdr> elf64_program_hdr_;
   vector<Elf32_Shdr> elf32_section_hdr_;
   vector<Elf64_Shdr> elf64_section_hdr_;
+  vector<string> elf32_section_name_;
+  vector<string> elf64_section_name_;
   DISALLOW_COPY_AND_ASSIGN(ReadELF);
 };
 

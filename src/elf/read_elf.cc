@@ -10,8 +10,7 @@ static void PrintSegmentType(uint32_t p_type) {
     case PT_NULL: printf("Unused entry"); break;
     case PT_LOAD: printf("Loadable segment"); break;
     case PT_DYNAMIC: printf("Dynamic linking information"); break;
-    case PT_INTERP:
-      printf("NULL-terminated pathname to invoke as an interpreter"); break;
+    case PT_INTERP: printf("Pathname to invoke as an interpreter"); break;
     case PT_NOTE: printf("Auxiliary information"); break;
     case PT_SHLIB: printf("Reserved"); break;
     case PT_PHDR: printf("Program header itself"); break;
@@ -110,21 +109,72 @@ bool ReadELF::AnalyzeELF() {
     close(fd);
     return false;
   }
+  if (!AnalyzeSectionName(fd)) {
+    printf("Broken section name!\n");
+    close(fd);
+    return false;
+  }
   close(fd);
   return true;
 }
 
 void ReadELF::PrintELFHeader() {
+  printf("\nThe ELF Header.\n");
   switch (elf_ident_[EI_CLASS]) {
     case ELFCLASS32:
-        PrintELF32Header();
+      PrintELF32Header();
       break;
     case ELFCLASS64:
-        PrintELF64Header();
+      PrintELF64Header();
       break;
     default:
-        printf("Bad Header\n");
+      printf("Bad Header\n");
   }
+}
+
+void ReadELF::PrintProgramHeader() {
+  int cnt = 0;
+  switch (elf_ident_[EI_CLASS]) {
+    case ELFCLASS32:
+      for (auto it = elf32_program_hdr_.begin();
+           it != elf32_program_hdr_.end(); ++it) {
+        printf("\nThe %dth Program Header.\n", ++cnt);
+        PrintProgramHeader32(&(*it));
+      }
+      break;
+    case ELFCLASS64:
+      for (auto it = elf64_program_hdr_.begin();
+           it != elf64_program_hdr_.end(); ++it) {
+        printf("\nThe %dth Program Header.\n", ++cnt);
+        PrintProgramHeader64(&(*it));
+      }
+      break;
+    default:
+      printf("Bad Header\n");
+  }
+}
+
+void ReadELF::PrintSectionHeader() {
+  int cnt = 0;
+  if (elf_ident_[EI_CLASS] == ELFCLASS32) {
+      auto it = elf32_section_hdr_.begin();
+      auto jt = elf32_section_name_.begin();
+      for (; it != elf32_section_hdr_.end() &&
+             jt != elf32_section_name_.end(); ++it, ++jt) {
+        printf("\nThe %dth Section Header: %s\n", ++cnt, (*jt).c_str());
+        PrintSectionHeader32(&(*it));
+      }
+    } else if (elf_ident_[EI_CLASS] == ELFCLASS64) {
+      auto it = elf64_section_hdr_.begin();
+      auto jt = elf64_section_name_.begin();
+      for (; it != elf64_section_hdr_.end() &&
+             jt != elf64_section_name_.end(); ++it, ++jt) {
+        printf("\nThe %dth Section Header: %s\n", ++cnt, (*jt).c_str());
+        PrintSectionHeader64(&(*it));
+      }
+    } else {
+      printf("Bad Header\n");
+    }
 }
 
 bool ReadELF::AnalyzeELFHeader(int fd) {
@@ -182,6 +232,18 @@ bool ReadELF::AnalyzeSectionHeader(int fd) {
       return AnalyzeSectionHeader32(fd);
     case ELFCLASS64:
       return AnalyzeSectionHeader64(fd);
+    default:
+      return false;
+  }
+  return true;
+}
+
+bool ReadELF::AnalyzeSectionName(int fd) {
+  switch (elf_ident_[EI_CLASS]) {
+    case ELFCLASS32:
+      return AnalyzeSectionName32(fd);
+    case ELFCLASS64:
+      return AnalyzeSectionName64(fd);
     default:
       return false;
   }
@@ -286,6 +348,58 @@ bool ReadELF::AnalyzeSectionHeader64(int fd) {
 #endif
     elf64_section_hdr_.push_back(hdr);
     offset += elf64_hdr_.e_shentsize;
+  }
+  return true;
+}
+
+bool ReadELF::AnalyzeSectionName32(int fd) {
+  elf32_section_name_.clear();
+  uint32_t offset = 0;
+  Elf32_Shdr shstrtab = elf32_section_hdr_[elf32_hdr_.e_shstrndx];
+  auto it = elf32_section_hdr_.begin();
+  for (; it != elf32_section_hdr_.end(); ++it) {
+    offset = shstrtab.sh_offset + (*it).sh_name;
+    if (lseek(fd, offset, SEEK_SET) < 0) {
+      return false;
+    }
+    string name;
+    char ch;
+    while (1) {
+      read(fd, &ch, 1);
+      if (ch == '\0')
+        break;
+      name.append(1, ch);
+    }
+#ifdef LOG_FOR_TEST
+    printf("%s\n", name.c_str());
+#endif
+    elf32_section_name_.push_back(name);
+  }
+  return true;
+}
+
+bool ReadELF::AnalyzeSectionName64(int fd) {
+  elf64_section_name_.clear();
+  uint64_t offset = 0;
+  Elf64_Shdr shstrtab = elf64_section_hdr_[elf64_hdr_.e_shstrndx];
+  auto it = elf64_section_hdr_.begin();
+  for (; it != elf64_section_hdr_.end(); ++it) {
+    offset = shstrtab.sh_offset + (*it).sh_name;
+    if (lseek(fd, offset, SEEK_SET) < 0) {
+      return false;
+    }
+    string name;
+    char ch;
+    while (1) {
+      read(fd, &ch, 1);
+      if (ch == '\0')
+        break;
+      name.append(1, ch);
+    }
+#ifdef LOG_FOR_TEST
+    printf("%s\n", name.c_str());
+#endif
+    elf64_section_name_.push_back(name);
   }
   return true;
 }
