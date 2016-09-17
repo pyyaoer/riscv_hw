@@ -1,6 +1,11 @@
 #include "read_elf.h"
 
 static void PrintSegmentType(uint32_t p_type) {
+  printf("%u, ", p_type);
+  if (p_type >= PT_LOPROC && p_type <= PT_HIPROC) {
+    printf("Reserved for processor-specific sematics");
+    return;
+  }
   switch (p_type) {
     case PT_NULL: printf("Unused entry"); break;
     case PT_LOAD: printf("Loadable segment"); break;
@@ -10,15 +15,43 @@ static void PrintSegmentType(uint32_t p_type) {
     case PT_NOTE: printf("Auxiliary information"); break;
     case PT_SHLIB: printf("Reserved"); break;
     case PT_PHDR: printf("Program header itself"); break;
-    case PT_LOPROC:
-    case PT_HIPROC:
-      printf("Reserved for processor-specific sematics"); break;
     case PT_GNU_STACK: printf("GNU extension for states of stack"); break;
     default: printf("Other segment");
   }
 }
 
+static void PrintSectionType(uint32_t sh_type) {
+  printf("%u, ", sh_type);
+  if (sh_type >= SHT_LOPROC && sh_type <= SHT_HIPROC) {
+    printf("Reserved for processor-specific sematics");
+    return;
+  }
+  if (sh_type >= SHT_LOPROC && sh_type <= SHT_HIPROC) {
+    printf("Reserved for application programs");
+    return;
+  }
+  switch (sh_type) {
+    case SHT_NULL: printf("Inactive"); break;
+    case SHT_PROGBITS: printf("Defined by program"); break;
+    case SHT_SYMTAB: printf("Symbol table"); break;
+    case SHT_STRTAB: printf("String table"); break;
+    case SHT_RELA:
+      printf("Relocation entries with explicit addends"); break;
+    case SHT_HASH: printf("Symbol hash table"); break;
+    case SHT_DYNAMIC: printf("Dynamic linking infomation"); break;
+    case SHT_NOTE: printf("File mark"); break;
+    case SHT_NOBITS: printf("Zero byte sector"); break;
+    case SHT_REL:
+      printf("Relocation offsets without explicit addends"); break;
+    case SHT_SHLIB: printf("Reserved"); break;
+    case SHT_DYNSYM:
+      printf("Minimal set of dynamic linking symbols"); break;
+    default: printf("Other section");
+  }
+}
+
 static void PrintELFType(uint16_t e_type) {
+  printf("%u, ", e_type);
   switch (e_type) {
     case ET_NONE: printf("Unknown Type"); break;
     case ET_REL: printf("Relocatable file"); break;
@@ -30,6 +63,7 @@ static void PrintELFType(uint16_t e_type) {
 }
 
 static void PrintELFArchitecture(uint16_t e_machine) {
+  printf("%u, ", e_machine);
   switch (e_machine) {
     case EM_NONE: printf("Unknown machine"); break;
     case EM_M32: printf("AT&T WE 32100"); break;
@@ -219,11 +253,67 @@ void ReadELF::PrintProgramHeader64(Elf64_Phdr *hdr) {
 }
 
 bool ReadELF::AnalyzeSectionHeader32(int fd) {
+  uint32_t offset = elf32_hdr_.e_shoff;
+  elf32_section_hdr_.clear();
+  for (int i = 0; i < elf32_hdr_.e_shnum; ++i) {
+    if (lseek(fd, offset, SEEK_SET) < 0) {
+      return false;
+    }
+    Elf32_Shdr hdr = {0};
+    read(fd, &hdr, elf32_hdr_.e_shentsize);
+#ifdef LOG_FOR_TEST
+    printf("\nThe %dth Section Header.\n", i+1);
+    PrintSectionHeader32(&hdr);
+#endif
+    elf32_section_hdr_.push_back(hdr);
+    offset += elf32_hdr_.e_shentsize;
+  }
   return true;
 }
 
 bool ReadELF::AnalyzeSectionHeader64(int fd) {
+  uint64_t offset = elf64_hdr_.e_shoff;
+  elf64_section_hdr_.clear();
+  for (int i = 0; i < elf64_hdr_.e_shnum; ++i) {
+    if (lseek(fd, offset, SEEK_SET) < 0) {
+      return false;
+    }
+    Elf64_Shdr hdr = {0};
+    read(fd, &hdr, elf64_hdr_.e_shentsize);
+#ifdef LOG_FOR_TEST
+    printf("\nThe %dth Section Header.\n", i+1);
+    PrintSectionHeader64(&hdr);
+#endif
+    elf64_section_hdr_.push_back(hdr);
+    offset += elf64_hdr_.e_shentsize;
+  }
   return true;
+}
+
+void ReadELF::PrintSectionHeader32(Elf32_Shdr *hdr) {
+  printf("sh_name:\t%u", static_cast<uint32_t>(hdr->sh_name));
+  printf("\nsh_type:\t");
+  PrintSectionType(hdr->sh_type);
+  printf("\nsh_flags:\t%u", static_cast<uint32_t>(hdr->sh_flags));
+  printf("\nsh_size:\t%u", static_cast<uint32_t>(hdr->sh_size));
+  printf("\nsh_link:\t%u", static_cast<uint32_t>(hdr->sh_link));
+  printf("\nsh_info:\t%u", static_cast<uint32_t>(hdr->sh_info));
+  printf("\nsh_addralign:\t%u", static_cast<uint32_t>(hdr->sh_addralign));
+  printf("\nsh_entsize:\t%u", static_cast<uint32_t>(hdr->sh_entsize));
+  printf("\n");
+}
+
+void ReadELF::PrintSectionHeader64(Elf64_Shdr *hdr) {
+  printf("sh_name:\t%lu", static_cast<uint64_t>(hdr->sh_name));
+  printf("\nsh_type:\t");
+  PrintSectionType(hdr->sh_type);
+  printf("\nsh_flags:\t%lu", static_cast<uint64_t>(hdr->sh_flags));
+  printf("\nsh_size:\t%lu", static_cast<uint64_t>(hdr->sh_size));
+  printf("\nsh_link:\t%lu", static_cast<uint64_t>(hdr->sh_link));
+  printf("\nsh_info:\t%lu", static_cast<uint64_t>(hdr->sh_info));
+  printf("\nsh_addralign:\t%lu", static_cast<uint64_t>(hdr->sh_addralign));
+  printf("\nsh_entsize:\t%lu", static_cast<uint64_t>(hdr->sh_entsize));
+  printf("\n");
 }
 
 void ReadELF::PrintELF32Header() {
@@ -236,6 +326,7 @@ void ReadELF::PrintELF32Header() {
   printf("\ne_machine:\t");
   PrintELFArchitecture(elf32_hdr_.e_machine);
   printf("\ne_version:\t");
+  printf("%u, ", elf32_hdr_.e_version);
   switch (elf32_hdr_.e_version) {
     case EV_NONE: printf("Invalid version"); break;
     case EV_CURRENT: printf("Current version"); break;
@@ -267,6 +358,7 @@ void ReadELF::PrintELF64Header() {
   printf("\ne_machine:\t");
   PrintELFArchitecture(elf64_hdr_.e_machine);
   printf("\ne_version:\t");
+  printf("%u, ", elf64_hdr_.e_version);
   switch (elf64_hdr_.e_version) {
     case EV_NONE: printf("Invalid version"); break;
     case EV_CURRENT: printf("Current version"); break;

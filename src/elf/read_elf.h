@@ -66,8 +66,8 @@ class ReadELF {
   // 32-bit & 64-bit for AnalyzeSectionHeader(int)
   bool AnalyzeSectionHeader32(int fd);
   bool AnalyzeSectionHeader64(int fd);
-  void PrintSectionHeader32(Elf32_Phdr *hdr);
-  void PrintSectionHeader64(Elf64_Phdr *hdr);
+  void PrintSectionHeader32(Elf32_Shdr *hdr);
+  void PrintSectionHeader64(Elf64_Shdr *hdr);
   // 32-bit & 64-bit for PrintELFHeader()
   void PrintELF32Header();
   void PrintELF64Header();
