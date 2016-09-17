@@ -43,7 +43,7 @@ bool ReadELF::AnalyzeELF() {
     printf("File does not exist!\n");
     return false;
   }
-  if (!VerifyELFFormat(fd)) {
+  if (!AnalyzeELFHeader(fd)) {
     printf("Format mismatch!\n");
     close(fd);
     return false;
@@ -51,7 +51,6 @@ bool ReadELF::AnalyzeELF() {
   close(fd);
   return true;
 }
-
 
 void ReadELF::PrintELFHeader() {
   switch (elf_ident_[EI_CLASS]) {
@@ -66,7 +65,7 @@ void ReadELF::PrintELFHeader() {
   }
 }
 
-bool ReadELF::VerifyELFFormat(int fd) {
+bool ReadELF::AnalyzeELFHeader(int fd) {
   if (lseek(fd, 0, SEEK_SET) < 0) {
     return false;
   }

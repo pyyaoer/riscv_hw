@@ -11,4 +11,4 @@ read_elf.o: read_elf.h
 .PHONY: clean
 
 clean:
-	rm -rf test *.o
+	rm -rf *.exe *.o
