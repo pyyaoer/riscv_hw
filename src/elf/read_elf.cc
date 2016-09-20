@@ -292,8 +292,8 @@ void ReadELF::PrintProgramHeader32(Elf32_Phdr *hdr) {
   printf("p_type: \t");
   PrintSegmentType(hdr->p_type);
   printf("\np_offset:\t%u", static_cast<uint32_t>(hdr->p_offset));
-  printf("\np_vaddr:\t%#08x", static_cast<uint32_t>(hdr->p_vaddr));
-  printf("\np_paddr:\t%#08x", static_cast<uint32_t>(hdr->p_paddr));
+  printf("\np_vaddr:\t0x%x", static_cast<uint32_t>(hdr->p_vaddr));
+  printf("\np_paddr:\t0x%x", static_cast<uint32_t>(hdr->p_paddr));
   printf("\np_filesz:\t%u", static_cast<uint32_t>(hdr->p_filesz));
   printf("\np_memsz:\t%u", static_cast<uint32_t>(hdr->p_memsz));
   printf("\np_flags:\t%u", static_cast<uint32_t>(hdr->p_flags));
@@ -305,8 +305,8 @@ void ReadELF::PrintProgramHeader64(Elf64_Phdr *hdr) {
   printf("p_type: \t");
   PrintSegmentType(hdr->p_type);
   printf("\np_offset:\t%lu", static_cast<uint64_t>(hdr->p_offset));
-  printf("\np_vaddr:\t%#016lx", static_cast<uint64_t>(hdr->p_vaddr));
-  printf("\np_paddr:\t%#016lx", static_cast<uint64_t>(hdr->p_paddr));
+  printf("\np_vaddr:\t0x%lx", static_cast<uint64_t>(hdr->p_vaddr));
+  printf("\np_paddr:\t0x%lx", static_cast<uint64_t>(hdr->p_paddr));
   printf("\np_filesz:\t%lu", static_cast<uint64_t>(hdr->p_filesz));
   printf("\np_memsz:\t%lu", static_cast<uint64_t>(hdr->p_memsz));
   printf("\np_flags:\t%lu", static_cast<uint64_t>(hdr->p_flags));
@@ -409,6 +409,8 @@ void ReadELF::PrintSectionHeader32(Elf32_Shdr *hdr) {
   printf("\nsh_type:\t");
   PrintSectionType(hdr->sh_type);
   printf("\nsh_flags:\t%u", static_cast<uint32_t>(hdr->sh_flags));
+  printf("\nsh_addr:\t0x%x", static_cast<uint32_t>(hdr->sh_addr));
+  printf("\nsh_offset:\t%u", static_cast<uint32_t>(hdr->sh_offset));
   printf("\nsh_size:\t%u", static_cast<uint32_t>(hdr->sh_size));
   printf("\nsh_link:\t%u", static_cast<uint32_t>(hdr->sh_link));
   printf("\nsh_info:\t%u", static_cast<uint32_t>(hdr->sh_info));
@@ -422,6 +424,8 @@ void ReadELF::PrintSectionHeader64(Elf64_Shdr *hdr) {
   printf("\nsh_type:\t");
   PrintSectionType(hdr->sh_type);
   printf("\nsh_flags:\t%lu", static_cast<uint64_t>(hdr->sh_flags));
+  printf("\nsh_addr:\t0x%lx", static_cast<uint64_t>(hdr->sh_addr));
+  printf("\nsh_offset:\t%lu", static_cast<uint64_t>(hdr->sh_offset));
   printf("\nsh_size:\t%lu", static_cast<uint64_t>(hdr->sh_size));
   printf("\nsh_link:\t%lu", static_cast<uint64_t>(hdr->sh_link));
   printf("\nsh_info:\t%lu", static_cast<uint64_t>(hdr->sh_info));
@@ -446,7 +450,7 @@ void ReadELF::PrintELF32Header() {
     case EV_CURRENT: printf("Current version"); break;
     default: printf("Other version");
   }
-  printf("\ne_entry:\t%#08x", static_cast<uint32_t>(elf32_hdr_.e_entry));
+  printf("\ne_entry:\t0x%x", static_cast<uint32_t>(elf32_hdr_.e_entry));
   printf("\ne_phoff:\t%u", static_cast<uint32_t>(elf32_hdr_.e_phoff));
   printf("\ne_shoff:\t%u", static_cast<uint32_t>(elf32_hdr_.e_shoff));
   printf("\ne_flags:\t%u", static_cast<uint32_t>(elf32_hdr_.e_flags));
@@ -478,7 +482,7 @@ void ReadELF::PrintELF64Header() {
     case EV_CURRENT: printf("Current version"); break;
     default: printf("Other version");
   }
-  printf("\ne_entry:\t%#016lx", static_cast<uint64_t>(elf64_hdr_.e_entry));
+  printf("\ne_entry:\t0x%lx", static_cast<uint64_t>(elf64_hdr_.e_entry));
   printf("\ne_phoff:\t%lu", static_cast<uint64_t>(elf64_hdr_.e_phoff));
   printf("\ne_shoff:\t%lu", static_cast<uint64_t>(elf64_hdr_.e_shoff));
   printf("\ne_flags:\t%lu", static_cast<uint64_t>(elf64_hdr_.e_flags));
