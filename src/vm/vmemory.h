@@ -7,8 +7,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <stdio.h>
-#include <vector>
-using std::vector;
+#include <map>
+using std::map;
+using std::pair;
 
 #define DISALLOW_COPY_AND_ASSIGN(TypeName) \
   TypeName(const TypeName&); \
@@ -18,30 +19,26 @@ class VPage;
 
 class VMemory {
  public:
-  VMemory(){}
-  ~VMemory(){}
-  void AccessByte(long long addr, char& content);
+  VMemory(): psize_(4096) {}
+  explicit VMemory(uint32_t _p);
+  ~VMemory();
+  void AccessByte(uint64_t addr, char& content);
 
  private:
-  vector<VPage> pages_;
+  uint32_t psize_;
+  map<uint64_t, VPage*> pages_;
   DISALLOW_COPY_AND_ASSIGN(VMemory);
 };
 
 class VPage {
  public:
   VPage() {VPage(4096);}
-  explicit VPage(unsigned _s): size_(_s) {
-    if (size_ <= 0 || (size_ & (size_-1)) != 0){
-      throw "Unexpected page size.";
-    }
-    data_ = new char[size_];
-    memset(data_, 0, size_);
-  }
+  explicit VPage(uint32_t _s);
   ~VPage() {delete[] data_;}
-  void AccessByte(unsigned vpo);
+  void AccessByte(uint32_t vpo, char& content);
 
  private:
-  unsigned size_;
+  uint32_t size_;
   char* data_;
   DISALLOW_COPY_AND_ASSIGN(VPage);
 };
