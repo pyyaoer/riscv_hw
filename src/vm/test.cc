@@ -2,9 +2,12 @@
 #include "vmemory.h"
 
 int main(void){
-  char content;
+  char input = 't';
+  char output = 'T';
   VMemory vm;
-  vm.AccessByte(123LL, content);
-  printf("%d\n", static_cast<int>(content));
+  vm.PutByte(123LL, input);
+  vm.GetByte(123LL, output);
+  printf("input: %c\n", input);
+  printf("output: %c\n", output);
   return 0;
 }

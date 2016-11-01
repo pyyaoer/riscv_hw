@@ -22,9 +22,12 @@ class VMemory {
   VMemory(): psize_(4096) {}
   explicit VMemory(uint32_t _p);
   ~VMemory();
-  void AccessByte(uint64_t addr, char& content);
+  void GetByte(uint64_t addr, char& content);
+  void PutByte(uint64_t addr, char content);
 
  private:
+  VPage* TouchPage(uint64_t vpn);
+
   uint32_t psize_;
   map<uint64_t, VPage*> pages_;
   DISALLOW_COPY_AND_ASSIGN(VMemory);
@@ -35,7 +38,8 @@ class VPage {
   VPage() {VPage(4096);}
   explicit VPage(uint32_t _s);
   ~VPage() {delete[] data_;}
-  void AccessByte(uint32_t vpo, char& content);
+  void GetByte(uint32_t vpo, char& content);
+  void PutByte(uint32_t vpo, char content);
 
  private:
   uint32_t size_;
