@@ -1,4 +1,4 @@
-#include "read_elf.h"
+#include "include/read_elf.h"
 
 static void PrintSegmentType(uint32_t p_type) {
   printf("%u, ", p_type);
