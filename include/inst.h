@@ -10,9 +10,10 @@
   TypeName(const TypeName&); \
   void operator=(const TypeName&)
 
-enum OpType { LOADS, STORES, F_EXT, BRANCHES, JALR,
-               FENCES, A_EXT, JAL, ARITHMETIC, SYSTEM,
-               AUIPC, LUI, RV64I, RV128I, ERROR };
+enum OpType { LOAD, LOAD_FP, MISC_MEM, OP_IMM, AUIPC,
+               OP_IMM_32, STORE, STORE_FP, AMO, OP, LUI,
+               OP_32, MADD, MSUB, NMSUB, NMADD, OP_FP,
+               BRANCH, JALR, JAL, SYSTEM, ERROR};
 
 class Inst {
  public:

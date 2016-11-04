@@ -1,35 +1,22 @@
 #include "include/inst.h"
 
 static const enum OpType kOpDecodeArr[4][8] = {
-  { LOADS, F_EXT, ERROR, FENCES,
-    ARITHMETIC, AUIPC, RV64I, ERROR },
-  { STORES, F_EXT, ERROR, A_EXT,
-    ARITHMETIC, LUI, RV64I, ERROR },
-  { F_EXT, F_EXT, F_EXT, F_EXT,
-    F_EXT, ERROR, RV128I, ERROR },
-  { BRANCHES, JALR, ERROR, JAL,
-    SYSTEM, ERROR, RV128I, ERROR }
+  { LOAD, LOAD_FP, ERROR, MISC_MEM,
+    OP_IMM, AUIPC, OP_IMM_32, ERROR },
+  { STORE, STORE_FP, ERROR, AMO,
+    OP, LUI, OP_32, ERROR },
+  { MADD, MSUB, NMSUB, NMADD,
+    OP_FP, ERROR, ERROR, ERROR },
+  { BRANCH, JALR, ERROR, JAL,
+    SYSTEM, ERROR, ERROR, ERROR }
 };
 
 inline static uint32_t uint_get_a2b(uint32_t inst,
                                      int a, int b) {
-  return ((b==31) ? inst : inst & (1 << (b+1) - 1)) >> a;
+  return ((b==31) ? inst : inst & ((1 << (b+1)) - 1)) >> a;
 }
 
-static void op_loads();
-static void op_stores();
-static void op_fext();
-static void op_branches();
-static void op_jalr();
-static void op_fences();
-static void op_aext();
-static void op_jal();
-static void op_arithmetic();
-static void op_system();
-static void op_auipc();
-static void op_lui();
-static void op_rv64i();
-static void op_rv128i();
+static void op_load();
 static void op_error();
 
 void Inst::AnalyzeInst() {
@@ -49,27 +36,34 @@ void Inst::AnalyzeInst() {
   }
 
   switch (inst_type) {
-    case LOADS:
-      op_loads();
+    case LOAD:
+      op_load();
       break;
-    case STORES:
-    case F_EXT:
-    case BRANCHES:
-    case JALR:
-    case FENCES:
-    case A_EXT:
-    case JAL:
-    case ARITHMETIC:
-    case SYSTEM:
+    case LOAD_FP:
+    case MISC_MEM:
+    case OP_IMM:
     case AUIPC:
+    case OP_IMM_32:
+    case STORE:
+    case STORE_FP:
+    case AMO:
+    case OP:
     case LUI:
-    case RV64I:
-    case RV128I:
+    case OP_32:
+    case MADD:
+    case MSUB:
+    case NMSUB:
+    case NMADD:
+    case OP_FP:
+    case BRANCH:
+    case JALR:
+    case JAL:
+    case SYSTEM:
     default:
       throw "Unsupported instruction";
   }
 }
 
-static void op_loads() {
+static void op_load() {
   return;
 }
