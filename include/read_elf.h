@@ -1,5 +1,5 @@
-#ifndef RISCV_ELF_READ_ELF_H_
-#define RISCV_ELF_READ_ELF_H_
+#ifndef RISCV_READ_ELF_H_
+#define RISCV_READ_ELF_H_
 
 #include <elf.h>
 #include <fcntl.h>
@@ -94,4 +94,4 @@ class ReadELF {
   DISALLOW_COPY_AND_ASSIGN(ReadELF);
 };
 
-#endif //RISCV_ELF_READ_ELF_H_
+#endif //RISCV_READ_ELF_H_

@@ -1,5 +1,5 @@
-#ifndef RISCV_VM_VMEMORY_H_
-#define RISCV_VM_VMEMORY_H_
+#ifndef RISCV_VMEMORY_H_
+#define RISCV_VMEMORY_H_
 
 #include <fcntl.h>
 #include <string>
@@ -47,4 +47,4 @@ class VPage {
   DISALLOW_COPY_AND_ASSIGN(VPage);
 };
 
-#endif //RISCV_VM_VMEMORY_H_
+#endif //RISCV_VMEMORY_H_
