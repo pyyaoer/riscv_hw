@@ -13,11 +13,28 @@
 enum OpType { LOAD, LOAD_FP, MISC_MEM, OP_IMM, AUIPC,
                OP_IMM_32, STORE, STORE_FP, AMO, OP, LUI,
                OP_32, MADD, MSUB, NMSUB, NMADD, OP_FP,
-               BRANCH, JALR, JAL, SYSTEM, ERROR};
+               BRANCH, JALR, JAL, SYSTEM, ERROR };
+enum InstFormat { R_TYPE, I_TYPE, S_TYPE, SB_TYPE,
+                  U_TYPE, UJ_TYPE };
+
+union InstArgs {
+  struct {
+    uint64_t op, rd, rs1, func3, rs2, func7;
+  } r_type;
+  struct {
+    uint64_t op, rd, rs1, func3, imm;
+  } i_type;
+  struct {
+    uint64_t op, imm, rs1, func3, rs2;
+  } s_type;
+  struct {
+    uint64_t op, rd, imm;
+  } u_type;
+};
 
 class Inst {
  public:
-  Inst() { Inst(0); }
+  Inst() { Inst(0x13); }
   explicit Inst(uint32_t _i) {
     SetInst(_i);
   }
@@ -26,20 +43,22 @@ class Inst {
     inst_ = _i;
     AnalyzeInst();
   }
+  void GetArgs(union InstArgs &args,
+                enum InstFormat &form) const {
+    form = form_;
+    memcpy(&args, &args_, sizeof(union InstArgs));
+  };
+  void GetOpType(enum OpType &type) const {
+    type = type_;
+  }
 
  private:
   void AnalyzeInst();
 
   uint32_t inst_;
-  struct {
-    uint32_t op;
-    uint32_t rd;
-    uint32_t rs1;
-    uint32_t rs2;
-    uint32_t func3;
-    uint32_t func7;
-    uint32_t imm;
-  } decode_;
+  enum OpType type_;
+  enum InstFormat form_;
+  union InstArgs args_;
   DISALLOW_COPY_AND_ASSIGN(Inst);
 };
 

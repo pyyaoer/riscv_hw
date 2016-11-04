@@ -15,7 +15,7 @@ AC_PROG_CC
 
 # Checks for header files.
 AC_CHECK_HEADERS([fcntl.h string.h unistd.h])
-AC_CHECK_HEADERS([read_elf.h vmemory.h inst.h])
+AC_CHECK_HEADERS([read_elf.h vmemory.h inst.h cpu.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_CHECK_HEADER_STDBOOL
