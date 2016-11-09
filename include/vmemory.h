@@ -24,6 +24,8 @@ class VMemory {
   ~VMemory();
   void GetByte(uint64_t addr, char& content);
   void PutByte(uint64_t addr, char content);
+  int GetNByte(uint64_t addr, char content[], int cnt);
+  int PutNByte(uint64_t addr, char content[], int cnt);
 
  private:
   VPage* TouchPage(uint64_t vpn);
@@ -40,6 +42,8 @@ class VPage {
   ~VPage() {delete[] data_;}
   void GetByte(uint32_t vpo, char& content);
   void PutByte(uint32_t vpo, char content);
+  void GetDWord(uint32_t vpo, uint32_t& content);
+  void PutDWord(uint32_t vpo, uint32_t content);
 
  private:
   uint32_t size_;

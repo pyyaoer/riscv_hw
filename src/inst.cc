@@ -30,7 +30,7 @@ void Inst::AnalyzeInst() {
 
   type_ = kOpDecodeArr[op_5_6][op_2_4];
   if (op_0_1 != 0x3 || type_ == ERROR) {
-    throw "Unexpected instruction opcode";
+    throw "Exception: Unexpected instruction opcode";
   }
 
   switch (type_) {

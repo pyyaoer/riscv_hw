@@ -6,7 +6,7 @@ bool IsValidPageSize(uint32_t psize){
 
 VMemory::VMemory(uint32_t _p): psize_(_p) {
   if (!IsValidPageSize(psize_)){
-    throw "Unexpected page size.";
+    throw "Exception: Unexpected page size.";
   }
 }
 
@@ -32,6 +32,22 @@ void VMemory::PutByte(uint64_t addr, char content) {
   vp->PutByte(vpo, content);
 }
 
+int VMemory::GetNByte(uint64_t addr, char content[], int cnt) {
+  int i = 0;
+  for (; i < cnt; i++){
+    GetByte(addr+i, content[i]);
+  }
+  return i;
+}
+
+int VMemory::PutNByte(uint64_t addr, char content[], int cnt) {
+  int i = 0;
+  for (; i < cnt; i++){
+    PutByte(addr+i, content[i]);
+  }
+  return i;
+}
+
 VPage* VMemory::TouchPage(uint64_t vpn){
   auto page_it = pages_.find(vpn);
   if (page_it == pages_.end()) {
@@ -45,7 +61,7 @@ VPage* VMemory::TouchPage(uint64_t vpn){
 
 VPage::VPage(uint32_t _s): size_(_s) {
   if (!IsValidPageSize(size_)){
-    throw "Unexpected page size.";
+    throw "Exception: Unexpected page size.";
   }
   data_ = new char[size_];
   memset(data_, 0, size_);
@@ -53,14 +69,14 @@ VPage::VPage(uint32_t _s): size_(_s) {
 
 void VPage::GetByte(unsigned vpo, char& content){
   if (vpo > size_) {
-    throw "Unexpected page offset.";
+    throw "Exception: Unexpected page offset.";
   }
   content = data_[vpo];
 }
 
 void VPage::PutByte(unsigned vpo, char content){
   if (vpo > size_) {
-    throw "Unexpected page offset.";
+    throw "Exception: Unexpected page offset.";
   }
   data_[vpo] = content;
 }

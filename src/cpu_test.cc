@@ -2,9 +2,16 @@
 
 int main(void) {
   try {
-    CPU cpu(0x400);
+    uint64_t init_pc = 0x1000;
+    union {
+      char c_inst[4] = {0};
+      uint32_t i_inst;
+    } inst;
+    inst.i_inst = 0x13;
+    CPU cpu(init_pc);
     VMemory vm;
     cpu.SetMem(&vm);
+    vm.PutNByte(init_pc, inst.c_inst, 4);
     while(1) {
       cpu.Fetch();
       cpu.Decode();
