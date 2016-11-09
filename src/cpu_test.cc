@@ -3,6 +3,8 @@
 int main(void) {
   try {
     CPU cpu(0x400);
+    VMemory vm;
+    cpu.SetMem(&vm);
     while(1) {
       cpu.Fetch();
       cpu.Decode();

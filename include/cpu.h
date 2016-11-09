@@ -21,13 +21,16 @@ class CPU {
   explicit CPU(uint64_t pc);
   ~CPU() {
     delete inst_;
-    delete vm_;
   };
 
   void SetPC(uint64_t pc) { pc_ = pc; }
   void GetPC(uint64_t &pc) const { pc = pc_; };
   void SetReg(uint64_t content, uint32_t n);
   void GetReg(uint64_t &content, uint32_t n) const;
+  void SetMem(VMemory* vm) {
+    if (vm_ == NULL) vm_ = vm;
+    else throw "Exception: VM exists";
+  };
 
   void Fetch();
   void Decode();

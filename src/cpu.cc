@@ -12,7 +12,7 @@ CPU::CPU(uint64_t pc) {
   pc_ = 0;
   memset(reg, 0, sizeof(reg));
   inst_ = new Inst;
-  vm_ = new VMemory;
+  vm_ = NULL;
 }
 
 void CPU::SetReg(uint64_t content, uint32_t n) {
