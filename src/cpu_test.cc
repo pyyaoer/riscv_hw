@@ -7,7 +7,7 @@ int main(void) {
       char c_inst[4] = {0};
       uint32_t i_inst;
     } inst;
-    inst.i_inst = 0x13;
+    inst.i_inst = 0x4013;
     CPU cpu(init_pc);
     VMemory vm;
     cpu.SetMem(&vm);
