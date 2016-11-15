@@ -37,7 +37,33 @@ class CPU {
   void Execute();
 
  private:
-  //void IsValidRegIndex(uint32_t n) const;
+  // R-TYPE
+  void exec_OP(r_type r);
+  void exec_OP_32(r_type r);
+  void exec_AMO(r_type r);
+  void exec_STORE_FP(r_type r);
+  void exec_OP_FP(r_type r);
+  void exec_MADD(r_type r);
+  void exec_MSUB(r_type r);
+  void exec_NMADD(r_type r);
+  void exec_NMSUB(r_type r);
+  // I-TYPE
+  void exec_OP_IMM(i_type i);
+  void exec_JALR(i_type i);
+  void exec_LOAD(i_type i);
+  void exec_MISC_MEM(i_type i);
+  void exec_SYSTEM(i_type i);
+  void exec_OP_IMM_32(i_type i);
+  void exec_LOAD_FP(i_type i);
+  // S-TYPE
+  void exec_STORE(s_type s);
+  // SB-TYPE
+  void exec_BRANCH(sb_type sb);
+  // U-TYPE
+  void exec_LUI(u_type u);
+  void exec_AUIPC(u_type u);
+  // UJ-TYPE
+  void exec_JAL(uj_type uj);
 
   uint64_t pc_;
   uint64_t reg[32];

@@ -20,12 +20,17 @@ void Inst::AnalyzeInst() {
     } s_op;
     uint32_t u_op;
   } op_field;
-  op_field.u_op = args_.r_type.op;
+  op_field.u_op = args_.r.op;
 
   if (op_field.s_op.op0_1 != 0x3 || type_ == ERROR) {
     throw "Exception: Unexpected instruction opcode";
   }
   type_ = kOpDecodeArr[op_field.s_op.op5_6][op_field.s_op.op2_4];
+
+  s_type s = args_.s;
+  sb_type sb = args_.sb;
+  u_type u = args_.u;
+  uj_type uj = args_.uj;
 
   switch (type_) {
     //R-TYPE
@@ -52,30 +57,29 @@ void Inst::AnalyzeInst() {
       break;
     //S-TYPE
     case STORE:
-      args_.s_type.imm = args_.s_type.imm0_4
-                  + (args_.s_type.imm5_11 << 5);
+      s.imm = s.imm0_4 + (s.imm5_11 << 5);
       form_ = S_TYPE;
       break;
     //SB-TYPE
     case BRANCH:
-      args_.sb_type.imm = (args_.sb_type.imm11 << 11)
-                  + (args_.sb_type.imm1_4 << 1)
-                  + (args_.sb_type.imm5_10 << 5)
-                  + (args_.sb_type.imm12 << 12);
+      sb.imm = (sb.imm11 << 11)
+             + (sb.imm1_4 << 1)
+             + (sb.imm5_10 << 5)
+             + (sb.imm12 << 12);
       form_ = SB_TYPE;
       break;
     //U-TYPE
     case LUI:
     case AUIPC:
-      args_.u_type.imm = (args_.u_type.imm12_31 << 12);
+      u.imm = (u.imm12_31 << 12);
       form_ = U_TYPE;
       break;
     //UJ-TYPE
     case JAL:
-      args_.uj_type.imm = (args_.uj_type.imm12_19 << 12)
-                  + (args_.uj_type.imm11 << 11)
-                  + (args_.uj_type.imm1_10 << 1)
-                  + (args_.uj_type.imm20 << 20);
+      uj.imm = (uj.imm12_19 << 12)
+             + (uj.imm11 << 11)
+             + (uj.imm1_10 << 1)
+             + (uj.imm20 << 20);
       form_ = UJ_TYPE;
       break;
     default:
